@@ -184,35 +184,121 @@ co(function *() {
 
 * [co-parallel](): 控制并发的 parallel
 * [co-gather](): 获取所有返回结果和错误的 parallel
-* [co-wait](): sleep 
+* [co-wait](): sleep
 * ...
 
 #### [co-wiki](https://github.com/visionmedia/co/wiki) , [callback_hell](https://github.com/dead-horse/callback_hell)
 
 --
 
-### koa
-
-to be continue
+### [koa](https://github.com/koajs/koa)
 
 
+* TJ 和 Express 团队的新作品
+* 基于 generator 和 co 的异步解决方案
+* setter / getter 带来了更方便的 http 辅助方法
+* 更人性化的错误处理
+* 更灵活的中间件形式
+
+--
+
+### koa VS Express
+
+* 不提供默认路由
+* 不提供默认的模版渲染
+* 不支持 node 原生的 request 和 response
+* 不支持 express 中间件
 
 
+* 提供默认的异步解决方案（generator）
+* 更有表现力的中间件形式
+* 对 request / response 提供更好体验的中间件
 
+--
 
+### Hello world
 
+```
+var koa = require('koa');
+var app = koa();
 
+app.use(function *() {
+  this.body = 'hello!';
+});
 
+app.listen(7001);
+```
 
+#### [more examples](https://github.com/koajs/examples)
+--
 
+### 中间件
 
+```
+function *responseTime() {
+  var start = Date.now();
+  yield next;
+  var use = Date.now() - start;
+  this.set('X-ResponseTime', use);
+}
+```
 
+[执行流程图](https://camo.githubusercontent.com/49c9c703465d40f1a30e0a993a4008991b76d676/68747470733a2f2f692e636c6f756475702e636f6d2f4e374c3555616b4a6f302e676966)
+--
 
+### 更灵活的中间件形式
 
+```
+var koa = require('koa');
+var ejs = require('koa-ejs');
+var app = koa();
 
+ejs(app, {/*options*/});
+// 挂载 function* render() {} 在 context.prototype上
 
+app.use(function* () {
+  return yield this.render('index');
+});
+```
+--
 
+```
+var koa = require('koa');
+var session = require('koa-sess');
 
+var app = koa();
+app.use(session({
+  defer: true
+}));
 
+// 挂载 `session(getter & setter)` 到 context 上
 
+app.use(function* () {
+  var session = yield this.session;
+  session.name = 'foo';
+  this.body = {
+    name: session.name
+  };
+});
+```
+--
 
+### koa 中的异步
+
+```
+var fs = require('co-fs');
+
+app.use(function *(){
+  var paths = yield fs.readdir('docs');
+
+  // parallel
+  var files = yield paths.map(function(path){
+    return fs.readFile('docs/' + path, 'utf8');
+  });
+
+  this.type = 'markdown';
+  this.body = files.join('');
+});
+```
+
+--

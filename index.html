@@ -552,17 +552,117 @@ var thunk = co(function *() {
 <ul>
 <li><a href="">co-parallel</a>: 控制并发的 parallel</li>
 <li><a href="">co-gather</a>: 获取所有返回结果和错误的 parallel</li>
-<li><a href="">co-wait</a>: sleep </li>
+<li><a href="">co-wait</a>: sleep</li>
 <li>...</li>
 </ul>
 <h4 id="-co-wiki-https-github-com-visionmedia-co-wiki-callback_hell-https-github-com-dead-horse-callback_hell-"><a href="https://github.com/visionmedia/co/wiki">co-wiki</a> , <a href="https://github.com/dead-horse/callback_hell">callback_hell</a></h4>
 </section>
   </div>
   <div class="slide hidden" id="slide-12">
-    <section class="slide-content"><h3 id="koa">koa</h3>
+    <section class="slide-content"><h3 id="-koa-https-github-com-koajs-koa-"><a href="https://github.com/koajs/koa">koa</a></h3>
+<ul>
+<li>TJ 和 Express 团队的新作品</li>
+<li>基于 generator 和 co 的异步解决方案</li>
+<li>setter / getter 带来了更方便的 http 辅助方法</li>
+<li>更人性化的错误处理</li>
+<li>更灵活的中间件形式</li>
+</ul>
 </section>
   </div>
   <div class="slide hidden" id="slide-13">
+    <section class="slide-content"><h3 id="koa-vs-express">koa VS Express</h3>
+<ul>
+<li>不提供默认路由</li>
+<li>不提供默认的模版渲染</li>
+<li>不支持 node 原生的 request 和 response</li>
+<li>不支持 express 中间件</li>
+</ul>
+<ul>
+<li>提供默认的异步解决方案（generator）</li>
+<li>更有表现力的中间件形式</li>
+<li>对 request / response 提供更好体验的中间件</li>
+</ul>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-14">
+    <section class="slide-content"><h3 id="hello-world">Hello world</h3>
+<pre><code>var koa = require(&#39;koa&#39;);
+var app = koa();
+
+app.use(function *() {
+  this.body = &#39;hello!&#39;;
+});
+
+app.listen(7001);</code></pre>
+<h4 id="-more-examples-https-github-com-koajs-examples-"><a href="https://github.com/koajs/examples">more examples</a></h4>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-15">
+    <section class="slide-content"><h3 id="-">中间件</h3>
+<pre><code>function *responseTime() {
+  var start = Date.now();
+  yield next;
+  var use = Date.now() - start;
+  this.set(&#39;X-ResponseTime&#39;, use);
+}</code></pre>
+<p><a href="https://camo.githubusercontent.com/49c9c703465d40f1a30e0a993a4008991b76d676/68747470733a2f2f692e636c6f756475702e636f6d2f4e374c3555616b4a6f302e676966">执行流程图</a></p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-16">
+    <section class="slide-content"><h3 id="-">更灵活的中间件形式</h3>
+<pre><code>var koa = require(&#39;koa&#39;);
+var ejs = require(&#39;koa-ejs&#39;);
+var app = koa();
+
+ejs(app, {/*options*/});
+// 挂载 function* render() {} 在 context.prototype上
+
+app.use(function* () {
+  return yield this.render(&#39;index&#39;);
+});</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-17">
+    <section class="slide-content"><pre><code>var koa = require(&#39;koa&#39;);
+var session = require(&#39;koa-sess&#39;);
+
+var app = koa();
+app.use(session({
+  defer: true
+}));
+
+// 挂载 `session(getter &amp; setter)` 到 context 上
+
+app.use(function* () {
+  var session = yield this.session;
+  session.name = &#39;foo&#39;;
+  this.body = {
+    name: session.name
+  };
+});</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-18">
+    <section class="slide-content"><h3 id="koa-">koa 中的异步</h3>
+<pre><code>var fs = require(&#39;co-fs&#39;);
+
+app.use(function *(){
+  var paths = yield fs.readdir(&#39;docs&#39;);
+
+  // parallel
+  var files = yield paths.map(function(path){
+    return fs.readFile(&#39;docs/&#39; + path, &#39;utf8&#39;);
+  });
+
+  this.type = &#39;markdown&#39;;
+  this.body = files.join(&#39;&#39;);
+});</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-19">
+    <section class="slide-content"></section>
+  </div>
+  <div class="slide hidden" id="slide-20">
     <section class="slide-content"><div class="author">
   <h1 class="name">dead_horse</h1>
     <h3 class="url">
