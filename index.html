@@ -433,14 +433,34 @@ pre .chunk {
 &gt; res = gen.next();
 &gt; res.value === &#39;done&#39;;
 &gt; res.done = true;</code></pre>
-<p><a href="blob/master/fibonacci.js">fibonacci</a></p>
 </section>
   </div>
   <div class="slide hidden" id="slide-4">
-    <section class="slide-content"><h1 id="generator-">generator 与异步</h1>
+    <section class="slide-content"><h3 id="-fibonacci-https-github-com-dead-horse-co-and-koa-talk-blob-gh-pages-yield_callback-js-"><a href="https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/yield_callback.js">fibonacci</a></h3>
+<pre><code>function* fibonacci() {
+  var first = 0;
+  var second = 1;
+  var tmp;
+
+  yield first;
+  yield second;
+
+  var total = 100;
+
+  while(total--) {
+    tmp = first;
+    first = second;
+    second = tmp + second;
+    yield second;
+  }
+}</code></pre>
 </section>
   </div>
   <div class="slide hidden" id="slide-5">
+    <section class="slide-content"><h1 id="generator-">generator 与异步</h1>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-6">
     <section class="slide-content"><h3 id="yield-">yield 异步方法</h3>
 <pre><code>function delay(done) {
   setTimeout(function () {
@@ -463,9 +483,10 @@ function next(err, data) {
     ret.value(next);
   }
 }</code></pre>
+<p><a href="https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/yield_callback.js">full example</a></p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-6">
+  <div class="slide hidden" id="slide-7">
     <section class="slide-content"><h3 id="yieldable-and-thunk">yieldable and thunk</h3>
 <ul>
 <li>需要将所有的 callback 都转换成 thunk：</li>
@@ -479,7 +500,7 @@ function next(err, data) {
 <pre><code>yield thunk(args);</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-7">
+  <div class="slide hidden" id="slide-8">
     <section class="slide-content"><h3 id="callback-to-thunk">callback to thunk</h3>
 <ul>
 <li><a href="https://github.com/visionmedia/node-thunkify">thunkify</a></li>
@@ -501,7 +522,7 @@ function *() {
 }</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-8">
+  <div class="slide hidden" id="slide-9">
     <section class="slide-content"><h3 id="promise-to-thunk">promise to thunk</h3>
 <pre><code>function (promise) {
   return function (fn) {
@@ -512,7 +533,38 @@ function *() {
 }</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-9">
+  <div class="slide hidden" id="slide-10">
+    <section class="slide-content"><h3 id="-array-to-thunk-https-github-com-dead-horse-co-and-koa-talk-blob-gh-pages-yield_array-js-"><a href="https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/yield_array.js">Array to thunk</a></h3>
+<pre><code>function arrayToThunk(array) {
+  return function (done) {
+    var called = false;
+    var len = array.length;
+    var result = [];
+    var cb = function (err) {
+      if (called) return;
+      if (err) {
+        called = true;
+        return done(err);
+      }
+      if (--len === 0) {
+        called = true;
+        done(null, result);
+      }
+    };
+    array.forEach(function (fn, index) {
+      fn(function (err, data) {
+        if (err) {
+          return cb(err);
+        }
+        result[index] = data;
+        cb();
+      });
+    });
+  };
+}</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-11">
     <section class="slide-content"><h3 id="-co-https-github-com-visionmedia-co-"><a href="https://github.com/visionmedia/co">co</a></h3>
 <ul>
 <li>基于 generator 的异步编程</li>
@@ -530,7 +582,21 @@ var thunk = co(function *() {
 });</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-10">
+  <div class="slide hidden" id="slide-12">
+    <section class="slide-content"><h3 id="-">原理</h3>
+<ul>
+<li><p>可以被 yield 的有： thunk, promise, generator, generatorFunction, object, array</p>
+</li>
+<li><p>所有的 node 形式的 callback 都需要转换成 <code>thunk</code></p>
+</li>
+<li><p><code>object</code>,<code>array</code>,<code>promise</code> 自动识别并转换成 <code>thunk</code></p>
+</li>
+<li><p><code>generator</code>, <code>generatorFunction</code> 自动识别并展开执行</p>
+</li>
+</ul>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-13">
     <section class="slide-content"><h3 id="series-and-parallel">series and parallel</h3>
 <ul>
 <li><code>series</code></li>
@@ -547,21 +613,21 @@ var thunk = co(function *() {
 })();</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-11">
+  <div class="slide hidden" id="slide-14">
     <section class="slide-content"><h3 id="-co-">基于 co 的流程控制</h3>
 <ul>
-<li><a href="">co-parallel</a>: 控制并发的 parallel</li>
-<li><a href="">co-gather</a>: 获取所有返回结果和错误的 parallel</li>
-<li><a href="">co-wait</a>: sleep</li>
+<li><a href="https://github.com/visionmedia/co-parallel">co-parallel</a>: 控制并发的 parallel</li>
+<li><a href="https://github.com/dead-horse/co-gather">co-gather</a>: 获取所有返回结果和错误的 parallel</li>
+<li><a href="https://github.com/juliangruber/co-wait">co-wait</a>: setTimeout 的 generator 版本</li>
 <li>...</li>
 </ul>
 <h4 id="-co-wiki-https-github-com-visionmedia-co-wiki-callback_hell-https-github-com-dead-horse-callback_hell-"><a href="https://github.com/visionmedia/co/wiki">co-wiki</a> , <a href="https://github.com/dead-horse/callback_hell">callback_hell</a></h4>
 </section>
   </div>
-  <div class="slide hidden" id="slide-12">
+  <div class="slide hidden" id="slide-15">
     <section class="slide-content"><h3 id="-koa-https-github-com-koajs-koa-"><a href="https://github.com/koajs/koa">koa</a></h3>
 <ul>
-<li>TJ 和 Express 团队的新作品</li>
+<li>TJ 和 express 团队的新作品</li>
 <li>基于 generator 和 co 的异步解决方案</li>
 <li>setter / getter 带来了更方便的 http 辅助方法</li>
 <li>更人性化的错误处理</li>
@@ -569,8 +635,8 @@ var thunk = co(function *() {
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-13">
-    <section class="slide-content"><h3 id="koa-vs-express">koa VS Express</h3>
+  <div class="slide hidden" id="slide-16">
+    <section class="slide-content"><h3 id="koa-vs-express">koa VS express</h3>
 <ul>
 <li>不提供默认路由</li>
 <li>不提供默认的模版渲染</li>
@@ -584,7 +650,7 @@ var thunk = co(function *() {
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-14">
+  <div class="slide hidden" id="slide-17">
     <section class="slide-content"><h3 id="hello-world">Hello world</h3>
 <pre><code>var koa = require(&#39;koa&#39;);
 var app = koa();
@@ -597,9 +663,13 @@ app.listen(7001);</code></pre>
 <h4 id="-more-examples-https-github-com-koajs-examples-"><a href="https://github.com/koajs/examples">more examples</a></h4>
 </section>
   </div>
-  <div class="slide hidden" id="slide-15">
+  <div class="slide hidden" id="slide-18">
     <section class="slide-content"><h3 id="-">中间件</h3>
-<pre><code>function *responseTime() {
+<p><img src="https://raw.github.com/fengmk2/koa-guide/master/onion.png" alt="middleware"></p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-19">
+    <section class="slide-content"><pre><code>function *responseTime() {
   var start = Date.now();
   yield next;
   var use = Date.now() - start;
@@ -608,7 +678,7 @@ app.listen(7001);</code></pre>
 <p><a href="https://camo.githubusercontent.com/49c9c703465d40f1a30e0a993a4008991b76d676/68747470733a2f2f692e636c6f756475702e636f6d2f4e374c3555616b4a6f302e676966">执行流程图</a></p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-16">
+  <div class="slide hidden" id="slide-20">
     <section class="slide-content"><h3 id="-">更灵活的中间件形式</h3>
 <pre><code>var koa = require(&#39;koa&#39;);
 var ejs = require(&#39;koa-ejs&#39;);
@@ -622,7 +692,7 @@ app.use(function* () {
 });</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-17">
+  <div class="slide hidden" id="slide-21">
     <section class="slide-content"><pre><code>var koa = require(&#39;koa&#39;);
 var session = require(&#39;koa-sess&#39;);
 
@@ -642,7 +712,7 @@ app.use(function* () {
 });</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-18">
+  <div class="slide hidden" id="slide-22">
     <section class="slide-content"><h3 id="koa-">koa 中的异步</h3>
 <pre><code>var fs = require(&#39;co-fs&#39;);
 
@@ -659,10 +729,52 @@ app.use(function *(){
 });</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-19">
-    <section class="slide-content"></section>
+  <div class="slide hidden" id="slide-23">
+    <section class="slide-content"><h3 id="-">异常处理</h3>
+<pre><code>app.use(function *() {
+  try {
+    var file = yield fs.readFile(&#39;./README.md&#39;);
+  } catch (err) {
+    if (err.code === &#39;ENOENT&#39;) {
+      this.status = 404;
+      this.body = &#39;can not found readme&#39;
+      return;
+    };
+    return this.throw(err);
+  }
+});</code></pre>
+<pre><code>app.use(function *() {
+  var stream = request(&#39;http://alibaba.com&#39;);
+  stream.on(&#39;error&#39;, this.onerror);
+  this.body = stream;
+});</code></pre>
+</section>
   </div>
-  <div class="slide hidden" id="slide-20">
+  <div class="slide hidden" id="slide-24">
+    <section class="slide-content"><h3 id="-koa-">基于 koa 的应用</h3>
+<ul>
+<li><a href="http://cnpmjs.org/">cnpmjs.org</a> - Private npm registry and web for Enterprise, base on koa, MySQL and Simple Store Service.</li>
+<li><a href="https://github.com/funraiseme/simgr-server">simgr</a> - Image proxy and resizing server</li>
+<li><a href="https://github.com/component/crawler.js">component-crawler</a> - <code>component.json</code> crawler</li>
+</ul>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-25">
+    <section class="slide-content"><h3 id="-okey-https-github-com-dead-horse-okey-"><a href="https://github.com/dead-horse/okey">okey</a></h3>
+<ul>
+<li>简单封装 koa，内置常用中间件，默认开启部分中间件</li>
+<li>兼容 koa 的任何中间件</li>
+<li>通过默认配置来约定项目结构</li>
+<li>不引入任何一个中间件依赖，使用时提示用户安装，便于中间件维护升级</li>
+<li>可扩展更改内置中间件和默认中间件和配置，扩展成公司、团队内部的框架</li>
+</ul>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-26">
+    <section class="slide-content"><h1 id="q-a">Q &amp; A</h1>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-27">
     <section class="slide-content"><div class="author">
   <h1 class="name">dead_horse</h1>
     <h3 class="url">

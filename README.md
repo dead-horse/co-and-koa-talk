@@ -45,7 +45,29 @@ function* hello() {
 
 ```
 
-[fibonacci](blob/master/fibonacci.js)
+--
+
+### [fibonacci](https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/yield_callback.js)
+
+```
+function* fibonacci() {
+  var first = 0;
+  var second = 1;
+  var tmp;
+
+  yield first;
+  yield second;
+
+  var total = 100;
+
+  while(total--) {
+    tmp = first;
+    first = second;
+    second = tmp + second;
+    yield second;
+  }
+}
+```
 
 --
 
@@ -78,6 +100,8 @@ function next(err, data) {
   }
 }
 ```
+
+[full example](https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/yield_callback.js)
 
 --
 
@@ -136,6 +160,40 @@ function (promise) {
   }
 }
 ```
+--
+
+### [Array to thunk](https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/yield_array.js)
+
+```
+function arrayToThunk(array) {
+  return function (done) {
+    var called = false;
+    var len = array.length;
+    var result = [];
+    var cb = function (err) {
+      if (called) return;
+      if (err) {
+        called = true;
+        return done(err);
+      }
+      if (--len === 0) {
+        called = true;
+        done(null, result);
+      }
+    };
+    array.forEach(function (fn, index) {
+      fn(function (err, data) {
+        if (err) {
+          return cb(err);
+        }
+        result[index] = data;
+        cb();
+      });
+    });
+  };
+}
+
+```
 
 --
 
@@ -156,6 +214,17 @@ var thunk = co(function *() {
   var content = yield readFile('./README.md');
 });
 ```
+--
+
+### 原理
+
+* 可以被 yield 的有： thunk, promise, generator, generatorFunction, object, array
+
+* 所有的 node 形式的 callback 都需要转换成 `thunk`
+
+* `object`,`array`,`promise` 自动识别并转换成 `thunk`
+
+* `generator`, `generatorFunction` 自动识别并展开执行
 
 --
 
@@ -182,9 +251,9 @@ co(function *() {
 
 ### 基于 co 的流程控制
 
-* [co-parallel](): 控制并发的 parallel
-* [co-gather](): 获取所有返回结果和错误的 parallel
-* [co-wait](): sleep
+* [co-parallel](https://github.com/visionmedia/co-parallel): 控制并发的 parallel
+* [co-gather](https://github.com/dead-horse/co-gather): 获取所有返回结果和错误的 parallel
+* [co-wait](https://github.com/juliangruber/co-wait): setTimeout 的 generator 版本
 * ...
 
 #### [co-wiki](https://github.com/visionmedia/co/wiki) , [callback_hell](https://github.com/dead-horse/callback_hell)
@@ -194,7 +263,7 @@ co(function *() {
 ### [koa](https://github.com/koajs/koa)
 
 
-* TJ 和 Express 团队的新作品
+* TJ 和 express 团队的新作品
 * 基于 generator 和 co 的异步解决方案
 * setter / getter 带来了更方便的 http 辅助方法
 * 更人性化的错误处理
@@ -202,7 +271,7 @@ co(function *() {
 
 --
 
-### koa VS Express
+### koa VS express
 
 * 不提供默认路由
 * 不提供默认的模版渲染
@@ -233,6 +302,10 @@ app.listen(7001);
 --
 
 ### 中间件
+
+![middleware](https://raw.github.com/fengmk2/koa-guide/master/onion.png)
+
+--
 
 ```
 function *responseTime() {
@@ -302,3 +375,50 @@ app.use(function *(){
 ```
 
 --
+
+### 异常处理
+
+```
+app.use(function *() {
+  try {
+    var file = yield fs.readFile('./README.md');
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      this.status = 404;
+      this.body = 'can not found readme'
+      return;
+    };
+    return this.throw(err);
+  }
+});
+
+```
+
+```
+app.use(function *() {
+  var stream = request('http://alibaba.com');
+  stream.on('error', this.onerror);
+  this.body = stream;
+});
+```
+--
+
+### 基于 koa 的应用
+
+ - [cnpmjs.org](http://cnpmjs.org/) - Private npm registry and web for Enterprise, base on koa, MySQL and Simple Store Service.
+ - [simgr](https://github.com/funraiseme/simgr-server) - Image proxy and resizing server
+ - [component-crawler](https://github.com/component/crawler.js) - `component.json` crawler
+
+--
+
+### [okey](https://github.com/dead-horse/okey)
+
+* 简单封装 koa，内置常用中间件，默认开启部分中间件
+* 兼容 koa 的任何中间件
+* 通过默认配置来约定项目结构
+* 不引入任何一个中间件依赖，使用时提示用户安装，便于中间件维护升级
+* 可扩展更改内置中间件和默认中间件和配置，扩展成公司、团队内部的框架
+
+--
+
+# Q & A
