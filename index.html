@@ -467,20 +467,20 @@ pre .chunk {
     done(null, &#39;delay done&#39;);
   }, 1000);
 }
-function *async() {
+
+function *genFn() {
   console.log(&#39;before delay&#39;);
-  yield delay;
+  console.log(yield delay);
   console.log(&#39;after delay&#39;);
 }
 
-var gen = async();
-var ret = gen.next();
-ret.value(next);
-// wrap a next
-function next(err, data) {
-  ret = gen.next();
+var gen = genFn();
+next();
+
+function next(err, res) {
+  var ret = gen.next(res);
   if (!ret.done) {
-    ret.value(next);
+    return ret.value(next);
   }
 }</code></pre>
 <p><a href="https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/yield_callback.js">full example</a></p>
