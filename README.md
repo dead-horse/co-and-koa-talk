@@ -83,20 +83,20 @@ function delay(done) {
     done(null, 'delay done');
   }, 1000);
 }
-function *async() {
+
+function *genFn() {
   console.log('before delay');
-  yield delay;
+  console.log(yield delay);
   console.log('after delay');
 }
 
-var gen = async();
-var ret = gen.next();
-ret.value(next);
-// wrap a next
-function next(err, data) {
-  ret = gen.next();
+var gen = genFn();
+next();
+
+function next(err, res) {
+  var ret = gen.next(res);
   if (!ret.done) {
-    ret.value(next);
+    return ret.value(next);
   }
 }
 ```
