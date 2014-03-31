@@ -13,8 +13,16 @@ function delay(done) {
   }, 1000);
 }
 
+var fs = require('fs');
+var stat = function (filename) {
+  return function (done) {
+    fs.stat(filename, done);
+  };
+}
+
 function *genFn() {
   console.log('before delay');
+  console.log(yield stat('./yield_callback.js'));
   console.log(yield delay);
   console.log('after delay');
 }
