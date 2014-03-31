@@ -436,7 +436,7 @@ pre .chunk {
 </section>
   </div>
   <div class="slide hidden" id="slide-4">
-    <section class="slide-content"><h3 id="-fibonacci-https-github-com-dead-horse-co-and-koa-talk-blob-gh-pages-yield_callback-js-"><a href="https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/yield_callback.js">fibonacci</a></h3>
+    <section class="slide-content"><h3 id="-fibonacci-https-github-com-dead-horse-co-and-koa-talk-blob-gh-pages-fibonacci-js-"><a href="https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/fibonacci.js">fibonacci</a></h3>
 <pre><code>function* fibonacci() {
   var first = 0;
   var second = 1;
@@ -504,6 +504,7 @@ function next(err, res) {
     <section class="slide-content"><h3 id="callback-to-thunk">callback to thunk</h3>
 <ul>
 <li><a href="https://github.com/visionmedia/node-thunkify">thunkify</a></li>
+<li><a href="https://github.com/dead-horse/node-thunkify-wrap">thunkify-wrap</a></li>
 </ul>
 <pre><code>fs.stat(filename, callback);
 
@@ -576,10 +577,10 @@ var fs = require(&#39;fs&#39;);
 var stat = thunkify(fs.stat);
 var readFile = thunkify(fs.readFile);
 
-var thunk = co(function *() {
+co(function *() {
   var stat = yield stat(&#39;./README.md&#39;);
   var content = yield readFile(&#39;./README.md&#39;);
-});</code></pre>
+})();</code></pre>
 </section>
   </div>
   <div class="slide hidden" id="slide-12">
@@ -661,6 +662,7 @@ app.use(function *() {
 
 app.listen(7001);</code></pre>
 <h4 id="-more-examples-https-github-com-koajs-examples-"><a href="https://github.com/koajs/examples">more examples</a></h4>
+<h4 id="-koa-todo-https-github-com-dead-horse-koa-todo-"><a href="https://github.com/dead-horse/koa-todo">koa-todo</a></h4>
 </section>
   </div>
   <div class="slide hidden" id="slide-18">
@@ -771,10 +773,35 @@ app.use(function *(){
 </section>
   </div>
   <div class="slide hidden" id="slide-26">
-    <section class="slide-content"><h1 id="q-a">Q &amp; A</h1>
+    <section class="slide-content"><h3 id="connect-koa-">connect 向 koa 迁移</h3>
+<ul>
+<li>框架配置和中间件替换</li>
+<li>model(proxy) 层通过 <code>thunkify</code> 或者 <code>thunkify-wrap</code> 包装</li>
+<li>改写 controllers</li>
+<li>[进一步改写 proxy 层]</li>
+</ul>
 </section>
   </div>
   <div class="slide hidden" id="slide-27">
+    <section class="slide-content"><h3 id="-co-">基于 co 的单元测试</h3>
+<ul>
+<li>mocha 开启选项： --harmony</li>
+<li>mocha 添加依赖：--require co-mocha</li>
+</ul>
+<pre><code>$ mocha --harmony --require co-mocha
+
+it(&#39;should co work fine&#39;, function *() {
+  var stat = yield fs.stat(&#39;./README.md&#39;);
+  var content = yield fs.readFile(&#39;./README.md&#39;);
+  assert(stat.size === content.length);
+});</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-28">
+    <section class="slide-content"><h1 id="q-a">Q &amp; A</h1>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-29">
     <section class="slide-content"><div class="author">
   <h1 class="name">dead_horse</h1>
     <h3 class="url">
