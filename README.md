@@ -47,7 +47,7 @@ function* hello() {
 
 --
 
-### [fibonacci](https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/yield_callback.js)
+### [fibonacci](https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/fibonacci.js)
 
 ```
 function* fibonacci() {
@@ -128,6 +128,7 @@ yield thunk(args);
 ### callback to thunk
 
 * [thunkify](https://github.com/visionmedia/node-thunkify)
+* [thunkify-wrap](https://github.com/dead-horse/node-thunkify-wrap)
 
 ```
 fs.stat(filename, callback);
@@ -209,10 +210,10 @@ var fs = require('fs');
 var stat = thunkify(fs.stat);
 var readFile = thunkify(fs.readFile);
 
-var thunk = co(function *() {
+co(function *() {
   var stat = yield stat('./README.md');
   var content = yield readFile('./README.md');
-});
+})();
 ```
 --
 
@@ -299,6 +300,8 @@ app.listen(7001);
 ```
 
 #### [more examples](https://github.com/koajs/examples)
+#### [koa-todo](https://github.com/dead-horse/koa-todo)
+
 --
 
 ### 中间件
@@ -421,4 +424,30 @@ app.use(function *() {
 
 --
 
+### connect 向 koa 迁移
+
+* 框架配置和中间件替换
+* model(proxy) 层通过 `thunkify` 或者 `thunkify-wrap` 包装
+* 改写 controllers
+* [进一步改写 proxy 层]
+
+--
+
+### 基于 co 的单元测试
+
+* mocha 开启选项： --harmony
+* mocha 添加依赖：--require co-mocha
+
+```
+$ mocha --harmony --require co-mocha
+
+it('should co work fine', function *() {
+  var stat = yield fs.stat('./README.md');
+  var content = yield fs.readFile('./README.md');
+  assert(stat.size === content.length);
+});
+```
+--
+
 # Q & A
+
