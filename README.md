@@ -257,7 +257,7 @@ co(function *() {
 * [co-wait](https://github.com/juliangruber/co-wait): setTimeout 的 generator 版本
 * ...
 
-#### [co-wiki](https://github.com/visionmedia/co/wiki) , [callback_hell](https://github.com/dead-horse/callback_hell)
+#### [co-wiki](https://github.com/visionmedia/co/wiki) , [callback_hell](https://github.com/dead-horse/callback_hell), [cojs](https://github.com/cojs)
 
 --
 
@@ -454,6 +454,16 @@ it('should co work fine', function *() {
   assert(stat.size === content.length);
 });
 ```
+--
+
+### 推荐关注
+
+* [koajs](https://github.com/koajs)
+* [cojs](https://github.com/cojs)
+* [TJ Holowaychuk](https://github.com/visionmedia)
+* [Jonathan Ong](https://github.com/jonathanong)
+* [Julian Gruber](https://github.com/juliangruber)
+
 --
 
 # Q & A
