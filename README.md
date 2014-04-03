@@ -244,7 +244,7 @@ co(function *() {
 
 ```
 co(function *() {
- var res = [yield request(a), yield request(b)];
+ var res = yield [request(a), request(b)];
 })();
 ```
 
@@ -467,4 +467,3 @@ it('should co work fine', function *() {
 --
 
 # Q & A
-
