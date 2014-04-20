@@ -261,6 +261,18 @@ co(function *() {
 
 --
 
+### [regenerator](https://github.com/facebook/renegerator)
+
+* 把 generator 代码编译成 ES5 的代码
+* 可以实现基于 generator 的编写的库的向下兼容
+* 但是需要保证所有的依赖(dependencies) 都是向下兼容(非 generator 或者支持转换)的
+* Examples
+  * [regenerator example](regenerator)
+  * [co-urllib](https://github.com/node-modules/co-urllib)
+  * [ali-oss](https://github.com/node-modules/ali-oss)
+
+--
+
 ### [koa](https://github.com/koajs/koa)
 
 
