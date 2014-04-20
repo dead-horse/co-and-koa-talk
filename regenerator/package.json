@@ -1,0 +1,15 @@
+{
+  "name": "renenerator-example",
+  "version": "0.0.0",
+  "dependencies": {
+    "generator-supported": "0.0.1",
+    "thunkify": "2.1.1"
+  },
+  "devDependencies": {
+    "co": "^3.0.5",
+    "ali.regenerator": "*"
+  },
+  "scripts": {
+    "prepublish": "make clean build"
+  }
+}
