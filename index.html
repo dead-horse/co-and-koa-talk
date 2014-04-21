@@ -610,7 +610,7 @@ co(function *() {
 <li><code>parallel</code></li>
 </ul>
 <pre><code>co(function *() {
- var res = [yield request(a), yield request(b)];
+ var res = yield [request(a), request(b)];
 })();</code></pre>
 </section>
   </div>
@@ -626,6 +626,21 @@ co(function *() {
 </section>
   </div>
   <div class="slide hidden" id="slide-15">
+    <section class="slide-content"><h3 id="-regenerator-https-github-com-facebook-renegerator-"><a href="https://github.com/facebook/renegerator">regenerator</a></h3>
+<ul>
+<li>把 generator 代码编译成 ES5 的代码</li>
+<li>可以实现基于 generator 的编写的库的向下兼容</li>
+<li>但是需要保证所有的依赖(dependencies) 都是向下兼容(非 generator 或者支持转换)的</li>
+<li>Examples<ul>
+<li><a href="regenerator">regenerator example</a></li>
+<li><a href="https://github.com/node-modules/co-urllib">co-urllib</a></li>
+<li><a href="https://github.com/node-modules/ali-oss">ali-oss</a></li>
+</ul>
+</li>
+</ul>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-16">
     <section class="slide-content"><h3 id="-koa-https-github-com-koajs-koa-"><a href="https://github.com/koajs/koa">koa</a></h3>
 <ul>
 <li>TJ 和 express 团队的新作品</li>
@@ -636,7 +651,7 @@ co(function *() {
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-16">
+  <div class="slide hidden" id="slide-17">
     <section class="slide-content"><h3 id="koa-vs-express">koa VS express</h3>
 <ul>
 <li>不提供默认路由</li>
@@ -651,7 +666,7 @@ co(function *() {
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-17">
+  <div class="slide hidden" id="slide-18">
     <section class="slide-content"><h3 id="hello-world">Hello world</h3>
 <pre><code>var koa = require(&#39;koa&#39;);
 var app = koa();
@@ -665,12 +680,12 @@ app.listen(7001);</code></pre>
 <h4 id="-koa-todo-https-github-com-dead-horse-koa-todo-"><a href="https://github.com/dead-horse/koa-todo">koa-todo</a></h4>
 </section>
   </div>
-  <div class="slide hidden" id="slide-18">
+  <div class="slide hidden" id="slide-19">
     <section class="slide-content"><h3 id="-">中间件</h3>
 <p><img src="https://raw.github.com/fengmk2/koa-guide/master/onion.png" alt="middleware"></p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-19">
+  <div class="slide hidden" id="slide-20">
     <section class="slide-content"><pre><code>function *responseTime() {
   var start = Date.now();
   yield next;
@@ -680,7 +695,7 @@ app.listen(7001);</code></pre>
 <p><a href="https://camo.githubusercontent.com/49c9c703465d40f1a30e0a993a4008991b76d676/68747470733a2f2f692e636c6f756475702e636f6d2f4e374c3555616b4a6f302e676966">执行流程图</a></p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-20">
+  <div class="slide hidden" id="slide-21">
     <section class="slide-content"><h3 id="-">更灵活的中间件形式</h3>
 <pre><code>var koa = require(&#39;koa&#39;);
 var ejs = require(&#39;koa-ejs&#39;);
@@ -694,7 +709,7 @@ app.use(function* () {
 });</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-21">
+  <div class="slide hidden" id="slide-22">
     <section class="slide-content"><pre><code>var koa = require(&#39;koa&#39;);
 var session = require(&#39;koa-sess&#39;);
 
@@ -714,7 +729,7 @@ app.use(function* () {
 });</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-22">
+  <div class="slide hidden" id="slide-23">
     <section class="slide-content"><h3 id="koa-">koa 中的异步</h3>
 <pre><code>var fs = require(&#39;co-fs&#39;);
 
@@ -731,7 +746,7 @@ app.use(function *(){
 });</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-23">
+  <div class="slide hidden" id="slide-24">
     <section class="slide-content"><h3 id="-">异常处理</h3>
 <pre><code>app.use(function *() {
   try {
@@ -752,7 +767,7 @@ app.use(function *(){
 });</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-24">
+  <div class="slide hidden" id="slide-25">
     <section class="slide-content"><h3 id="-koa-">基于 koa 的应用</h3>
 <ul>
 <li><a href="http://cnpmjs.org/">cnpmjs.org</a> - Private npm registry and web for Enterprise, base on koa, MySQL and Simple Store Service.</li>
@@ -761,7 +776,7 @@ app.use(function *(){
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-25">
+  <div class="slide hidden" id="slide-26">
     <section class="slide-content"><h3 id="-">更多中间件</h3>
 <ul>
 <li><a href="https://github.com/koajs/koa/wiki">koa-wiki</a></li>
@@ -769,7 +784,7 @@ app.use(function *(){
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-26">
+  <div class="slide hidden" id="slide-27">
     <section class="slide-content"><h3 id="-okey-https-github-com-dead-horse-okey-"><a href="https://github.com/dead-horse/okey">okey</a></h3>
 <ul>
 <li>简单封装 koa，内置常用中间件，默认开启部分中间件</li>
@@ -780,7 +795,7 @@ app.use(function *(){
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-27">
+  <div class="slide hidden" id="slide-28">
     <section class="slide-content"><h3 id="connect-koa-">connect 向 koa 迁移</h3>
 <ul>
 <li>框架配置和中间件替换</li>
@@ -790,7 +805,7 @@ app.use(function *(){
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-28">
+  <div class="slide hidden" id="slide-29">
     <section class="slide-content"><h3 id="-co-">基于 co 的单元测试</h3>
 <ul>
 <li>mocha 开启选项： --harmony</li>
@@ -805,7 +820,7 @@ it(&#39;should co work fine&#39;, function *() {
 });</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-29">
+  <div class="slide hidden" id="slide-30">
     <section class="slide-content"><h3 id="-">推荐关注</h3>
 <ul>
 <li><a href="https://github.com/koajs">koajs</a></li>
@@ -816,11 +831,11 @@ it(&#39;should co work fine&#39;, function *() {
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-30">
+  <div class="slide hidden" id="slide-31">
     <section class="slide-content"><h1 id="q-a">Q &amp; A</h1>
 </section>
   </div>
-  <div class="slide hidden" id="slide-31">
+  <div class="slide hidden" id="slide-32">
     <section class="slide-content"><div class="author">
   <h1 class="name">dead_horse</h1>
     <h3 class="url">
