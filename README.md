@@ -418,6 +418,13 @@ app.use(function *() {
 ```
 --
 
+### 深入理解 koa 福利
+
+* [why you should and shouldnt use koa](http://jongleberry.com/why-you-should-and-shouldnt-use-koa.html)
+* [jonathanong/koajs](https://github.com/jonathanong/koajs)
+
+--
+
 ### 基于 koa 的应用
 
  - [cnpmjs.org](http://cnpmjs.org/) - Private npm registry and web for Enterprise, base on koa, MySQL and Simple Store Service.
