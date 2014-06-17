@@ -440,17 +440,7 @@ app.use(function *() {
 
 --
 
-### [okey](https://github.com/dead-horse/okey)
-
-* 简单封装 koa，内置常用中间件，默认开启部分中间件
-* 兼容 koa 的任何中间件
-* 通过默认配置来约定项目结构
-* 不引入任何一个中间件依赖，使用时提示用户安装，便于中间件维护升级
-* 可扩展更改内置中间件和默认中间件和配置，扩展成公司、团队内部的框架
-
---
-
-### connect 向 koa 迁移
+### connect / experss 向 koa 迁移
 
 * 框架配置和中间件替换
 * model(proxy) 层通过 `thunkify` 或者 `thunkify-wrap` 包装
