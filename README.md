@@ -50,15 +50,13 @@ function* hello() {
 ### [fibonacci](https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/fibonacci.js)
 
 ```
-function* fibonacci() {
+function* fibonacci(total) {
   var first = 0;
   var second = 1;
   var tmp;
 
   yield first;
   yield second;
-
-  var total = 100;
 
   while(total--) {
     tmp = first;

@@ -6,15 +6,13 @@
  * $ node --harmony fibonacci.js
  * ```
  */
-function* fibonacci() {
+function* fibonacci(total) {
   var first = 0;
   var second = 1;
   var tmp;
 
   yield first;
   yield second;
-
-  var total = 100;
 
   while(total--) {
     tmp = first;
@@ -24,7 +22,8 @@ function* fibonacci() {
   }
 }
 
-var f = fibonacci();
+var total = parseInt(process.argv[2], 10) || 30;
+var f = fibonacci(total);
 var res;
 while(!(res = f.next()).done) {
   console.log(res.value);
