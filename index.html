@@ -437,15 +437,13 @@ pre .chunk {
   </div>
   <div class="slide hidden" id="slide-4">
     <section class="slide-content"><h3 id="-fibonacci-https-github-com-dead-horse-co-and-koa-talk-blob-gh-pages-fibonacci-js-"><a href="https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/fibonacci.js">fibonacci</a></h3>
-<pre><code>function* fibonacci() {
+<pre><code>function* fibonacci(total) {
   var first = 0;
   var second = 1;
   var tmp;
 
   yield first;
   yield second;
-
-  var total = 100;
 
   while(total--) {
     tmp = first;
