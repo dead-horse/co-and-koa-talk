@@ -760,7 +760,7 @@ app.use(function *(){
 });</code></pre>
 <pre><code>app.use(function *() {
   var stream = request(&#39;http://alibaba.com&#39;);
-  stream.on(&#39;error&#39;, this.onerror);
+  // stream.on(&#39;error&#39;, this.onerror); 不再需要监听 error 事件，this.body＝ 会处理
   this.body = stream;
 });</code></pre>
 </section>
@@ -796,7 +796,7 @@ app.use(function *(){
 <li>框架配置和中间件替换</li>
 <li>model(proxy) 层通过 <code>thunkify</code> 或者 <code>thunkify-wrap</code> 包装</li>
 <li>改写 controllers</li>
-<li>[进一步改写 proxy 层]</li>
+<li>[进一步改写 model 层]</li>
 </ul>
 </section>
   </div>

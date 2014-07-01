@@ -410,7 +410,7 @@ app.use(function *() {
 ```
 app.use(function *() {
   var stream = request('http://alibaba.com');
-  stream.on('error', this.onerror);
+  // stream.on('error', this.onerror); 不再需要监听 error 事件，this.body＝ 会处理
   this.body = stream;
 });
 ```
@@ -443,7 +443,7 @@ app.use(function *() {
 * 框架配置和中间件替换
 * model(proxy) 层通过 `thunkify` 或者 `thunkify-wrap` 包装
 * 改写 controllers
-* [进一步改写 proxy 层]
+* [进一步改写 model 层]
 
 --
 
