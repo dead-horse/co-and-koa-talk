@@ -1,21 +1,28 @@
-title: Generator, Co, Koa
+title: Generator, Co and Koa
+
 author:
+
   name: dead_horse
-  url: http://deadhorse.me
+
+  url: https://github.com/dead-horse
+
 output: index.html
-controls: true
+
+controls: false
 
 --
 
-# Co and Koa
+# [Generator, Co and Koa](https://github.com/dead-horse/co-and-koa-talk)
 
 --
 
-### generator
+## generator
 
 * ES6 新特性
 * node v0.11 可以使用 (node --harmony)
 * 通过 [gnode](https://github.com/TooTallNate/gnode) 体验
+
+--
 
 ```
 function* hello() {
@@ -26,8 +33,6 @@ function* hello() {
   return 'done';
 }
 ```
-
---
 
 ```
 > hello.constructor.name // GeneratorFunction
@@ -47,7 +52,7 @@ function* hello() {
 
 --
 
-### [fibonacci](https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/fibonacci.js)
+## [fibonacci](https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/fibonacci.js)
 
 ```
 function* fibonacci(total) {
@@ -73,7 +78,7 @@ function* fibonacci(total) {
 
 --
 
-### yield 异步方法
+## yield 异步方法
 
 ```
 function delay(done) {
@@ -103,27 +108,29 @@ function next(err, res) {
 
 --
 
-### yieldable and thunk
+## yieldable and thunk
 
-* 需要将所有的 callback 都转换成 thunk：
+* 只接受一个参数（且为callback）的异步函数
+* 需要将所有的 callback 形式的方法都转换成 thunk
 
 ```
-function (args) {
-  return function delay(done) {
-    fn(args, done);
+function delay(interval) {
+  // 返回的是一个 thunk
+  return function (done) {
+    setTimeout(function () {
+      done(null, 'delay done');
+    }, interval);
   };
 }
 ```
 
-thunk 执行之后返回的就是类似之前 `delay` 的函数，可以
-
 ```
-yield thunk(args);
+yield delay(1000);
 ```
 
 --
 
-### callback to thunk
+## callback to thunk
 
 * [thunkify](https://github.com/visionmedia/node-thunkify)
 * [thunkify-wrap](https://github.com/dead-horse/node-thunkify-wrap)
@@ -148,7 +155,7 @@ function *() {
 
 --
 
-### promise to thunk
+## promise to thunk
 
 ```
 function (promise) {
@@ -161,14 +168,24 @@ function (promise) {
 ```
 --
 
-### [Array to thunk](https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/yield_array.js)
+## [Array to thunk](https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/yield_array.js)
 
 ```
 function arrayToThunk(array) {
   return function (done) {
-    var called = false;
-    var len = array.length;
-    var result = [];
+    var called = false, len = array.length, result = [];
+    // 同时并发的执行 array 里面的异步函数
+    // 异步函数执行完调用 cb
+    // cb 调用 `array.lenth` 次之后执行 done
+    // 这样把一个函数的数组转换成了一个 thunk
+    array.forEach(function (fn, index) {
+      fn(function (err, data) {
+        if (err) return cb(err);
+        result[index] = data;
+        cb();
+      });
+    });
+    // cb 执行 `len` 次之后才会执行 done()
     var cb = function (err) {
       if (called) return;
       if (err) {
@@ -180,15 +197,6 @@ function arrayToThunk(array) {
         done(null, result);
       }
     };
-    array.forEach(function (fn, index) {
-      fn(function (err, data) {
-        if (err) {
-          return cb(err);
-        }
-        result[index] = data;
-        cb();
-      });
-    });
   };
 }
 
@@ -196,7 +204,7 @@ function arrayToThunk(array) {
 
 --
 
-### [co](https://github.com/visionmedia/co)
+## [co](https://github.com/visionmedia/co)
 
 * 基于 generator 的异步编程
 
@@ -215,7 +223,7 @@ co(function *() {
 ```
 --
 
-### 原理
+## 原理
 
 * 可以被 yield 的有： thunk, promise, generator, generatorFunction, object, array
 
@@ -227,7 +235,7 @@ co(function *() {
 
 --
 
-### series and parallel
+## series and parallel
 
 * `series`
 
@@ -248,7 +256,7 @@ co(function *() {
 
 --
 
-### 基于 co 的流程控制
+## 基于 co 的流程控制
 
 * [co-parallel](https://github.com/visionmedia/co-parallel): 控制并发的 parallel
 * [co-gather](https://github.com/dead-horse/co-gather): 获取所有返回结果和错误的 parallel
@@ -259,7 +267,7 @@ co(function *() {
 
 --
 
-### [regenerator](https://github.com/facebook/renegerator)
+## [regenerator](https://github.com/facebook/renegerator)
 
 * 把 generator 代码编译成 ES5 的代码
 * 可以实现基于 generator 的编写的库的向下兼容
@@ -271,7 +279,7 @@ co(function *() {
 
 --
 
-### [koa](https://github.com/koajs/koa)
+## [koa](https://github.com/koajs/koa)
 
 
 * TJ 和 express 团队的新作品
@@ -282,7 +290,7 @@ co(function *() {
 
 --
 
-### koa VS express
+## koa VS express
 
 * 不提供默认路由
 * 不提供默认的模版渲染
@@ -296,7 +304,7 @@ co(function *() {
 
 --
 
-### Hello world
+## Hello world
 
 ```
 var koa = require('koa');
@@ -314,7 +322,7 @@ app.listen(7001);
 
 --
 
-### 中间件
+## 中间件
 
 ![middleware](https://raw.github.com/fengmk2/koa-guide/master/onion.png)
 
@@ -332,7 +340,7 @@ function *responseTime() {
 [执行流程图](https://camo.githubusercontent.com/49c9c703465d40f1a30e0a993a4008991b76d676/68747470733a2f2f692e636c6f756475702e636f6d2f4e374c3555616b4a6f302e676966)
 --
 
-### 更灵活的中间件形式
+## 更灵活的中间件形式
 
 ```
 var koa = require('koa');
@@ -348,28 +356,15 @@ app.use(function* () {
 ```
 --
 
-```
-var koa = require('koa');
-var session = require('koa-sess');
+## 更简洁的中间件实现方式
 
-var app = koa();
-app.use(session({
-  defer: true
-}));
+* compress 中间件实现
+  - [koa-compress](https://github.com/koajs/compress/blob/master/index.js)
+  - [express-compression](https://github.com/expressjs/compression/blob/master/index.js)
 
-// 挂载 `session(getter & setter)` 到 context 上
-
-app.use(function* () {
-  var session = yield this.session;
-  session.name = 'foo';
-  this.body = {
-    name: session.name
-  };
-});
-```
 --
 
-### koa 中的异步
+## koa 中的异步
 
 ```
 var fs = require('co-fs');
@@ -389,7 +384,10 @@ app.use(function *(){
 
 --
 
-### 异常处理
+## 异常处理
+
+* 通过 `try catch` 来捕获所有的异常
+* 所有 throw 出去的 error 都会被 koa 捕获到
 
 ```
 app.use(function *() {
@@ -401,29 +399,63 @@ app.use(function *() {
       this.body = 'can not found readme'
       return;
     };
-    return this.throw(err);
+    throw err;
   }
 });
 
 ```
 
-```
-app.use(function *() {
-  var stream = request('http://alibaba.com');
-  // stream.on('error', this.onerror); 不再需要监听 error 事件，this.body＝ 会处理
-  this.body = stream;
-});
-```
 --
 
-### 深入理解 koa 福利
+## Stream 的异常处理
+
+* 原生 http server 和 express 中
+
+```
+http.createServer(function (req, res) {
+  var stream = fs.createReadStream('filename.txt');
+  stream
+  .on('error', onerror)
+  .pipe(zlib.createGzip())
+  .on('error', onerror)
+  .pipe(res);
+
+  function onerror(err) {
+    res.statusCode = 500;
+    res.end(err.message);
+    console.error(err.stack);
+  }
+
+  res.once('close', function () {
+    // 如果客户端终止了这个响应，可能导致 `fd` 泄漏, 需要 `unpipe` 来让它关闭这个 `fd`
+    stream.unpipe();
+  });
+});
+```
+
+--
+
+* koa 中通过神奇的 `this.body=` 帮你处理 Stream 的各种坑
+  - 不用担心 fd leak
+  - 不用负责监听 error
+
+```
+app.use(function *() {
+  this.body = fs.createReadStream('filename.txt');
+  this.body = this.body.pipe(zlib.createGzip());
+});
+```
+
+--
+
+## 深入理解 koa 福利
 
 * [why you should and shouldnt use koa](http://jongleberry.com/why-you-should-and-shouldnt-use-koa.html)
 * [jonathanong/koajs](https://github.com/jonathanong/koajs)
 
 --
 
-### 基于 koa 的应用
+## 基于 koa 的应用
 
  - [cnpmjs.org](http://cnpmjs.org/) - Private npm registry and web for Enterprise, base on koa, MySQL and Simple Store Service.
  - [simgr](https://github.com/funraiseme/simgr-server) - Image proxy and resizing server
@@ -431,14 +463,15 @@ app.use(function *() {
 
 --
 
-### 更多中间件
+## 更多中间件
 
 - [koa-wiki](https://github.com/koajs/koa/wiki)
 - [koajs](https://github.com/koajs)
+- [koa-middlewares](https://github.com/cnpmjs/koa-middlewares)
 
 --
 
-### connect / experss 向 koa 迁移
+## connect / experss 向 koa 迁移
 
 * 框架配置和中间件替换
 * model(proxy) 层通过 `thunkify` 或者 `thunkify-wrap` 包装
@@ -447,7 +480,7 @@ app.use(function *() {
 
 --
 
-### 基于 co 的单元测试
+## 基于 co 的单元测试
 
 * mocha 开启选项： --harmony
 * mocha 添加依赖：--require co-mocha
@@ -463,7 +496,7 @@ it('should co work fine', function *() {
 ```
 --
 
-### 推荐关注
+## 推荐关注
 
 * [koajs](https://github.com/koajs)
 * [cojs](https://github.com/cojs)

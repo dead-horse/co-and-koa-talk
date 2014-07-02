@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-  <title>Generator, Co, Koa</title>
+  <title>Generator, Co and Koa</title>
   <style type="text/css">
     body {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -401,27 +401,27 @@ pre .chunk {
   </div>
 
   <div class="slide" id="slide-1">
-    <section class="slide-content"><h1 id="co-and-koa">Co and Koa</h1>
+    <section class="slide-content"><h1 id="-generator-co-and-koa-https-github-com-dead-horse-co-and-koa-talk-"><a href="https://github.com/dead-horse/co-and-koa-talk">Generator, Co and Koa</a></h1>
 </section>
   </div>
   <div class="slide hidden" id="slide-2">
-    <section class="slide-content"><h3 id="generator">generator</h3>
+    <section class="slide-content"><h2 id="generator">generator</h2>
 <ul>
 <li>ES6 新特性</li>
 <li>node v0.11 可以使用 (node --harmony)</li>
 <li>通过 <a href="https://github.com/TooTallNate/gnode">gnode</a> 体验</li>
 </ul>
-<pre><code>function* hello() {
+</section>
+  </div>
+  <div class="slide hidden" id="slide-3">
+    <section class="slide-content"><pre><code>function* hello() {
   yield &#39;hello&#39;;
   yield function () {
     return &#39;generator&#39;;
   };
   return &#39;done&#39;;
 }</code></pre>
-</section>
-  </div>
-  <div class="slide hidden" id="slide-3">
-    <section class="slide-content"><pre><code>&gt; hello.constructor.name // GeneratorFunction
+<pre><code>&gt; hello.constructor.name // GeneratorFunction
 &gt; var gen = hello();
 &gt; typeof gen.next === &#39;funciton&#39;;
 &gt; typeof gen.throw === &#39;function&#39;;
@@ -436,7 +436,7 @@ pre .chunk {
 </section>
   </div>
   <div class="slide hidden" id="slide-4">
-    <section class="slide-content"><h3 id="-fibonacci-https-github-com-dead-horse-co-and-koa-talk-blob-gh-pages-fibonacci-js-"><a href="https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/fibonacci.js">fibonacci</a></h3>
+    <section class="slide-content"><h2 id="-fibonacci-https-github-com-dead-horse-co-and-koa-talk-blob-gh-pages-fibonacci-js-"><a href="https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/fibonacci.js">fibonacci</a></h2>
 <pre><code>function* fibonacci(total) {
   var first = 0;
   var second = 1;
@@ -459,7 +459,7 @@ pre .chunk {
 </section>
   </div>
   <div class="slide hidden" id="slide-6">
-    <section class="slide-content"><h3 id="yield-">yield 异步方法</h3>
+    <section class="slide-content"><h2 id="yield-">yield 异步方法</h2>
 <pre><code>function delay(done) {
   setTimeout(function () {
     done(null, &#39;delay done&#39;);
@@ -485,21 +485,24 @@ function next(err, res) {
 </section>
   </div>
   <div class="slide hidden" id="slide-7">
-    <section class="slide-content"><h3 id="yieldable-and-thunk">yieldable and thunk</h3>
+    <section class="slide-content"><h2 id="yieldable-and-thunk">yieldable and thunk</h2>
 <ul>
-<li>需要将所有的 callback 都转换成 thunk：</li>
+<li>只接受一个参数（且为callback）的异步函数</li>
+<li>需要将所有的 callback 形式的方法都转换成 thunk</li>
 </ul>
-<pre><code>function (args) {
-  return function delay(done) {
-    fn(args, done);
+<pre><code>function delay(interval) {
+  // 返回的是一个 thunk
+  return function (done) {
+    setTimeout(function () {
+      done(null, &#39;delay done&#39;);
+    }, interval);
   };
 }</code></pre>
-<p>thunk 执行之后返回的就是类似之前 <code>delay</code> 的函数，可以</p>
-<pre><code>yield thunk(args);</code></pre>
+<pre><code>yield delay(1000);</code></pre>
 </section>
   </div>
   <div class="slide hidden" id="slide-8">
-    <section class="slide-content"><h3 id="callback-to-thunk">callback to thunk</h3>
+    <section class="slide-content"><h2 id="callback-to-thunk">callback to thunk</h2>
 <ul>
 <li><a href="https://github.com/visionmedia/node-thunkify">thunkify</a></li>
 <li><a href="https://github.com/dead-horse/node-thunkify-wrap">thunkify-wrap</a></li>
@@ -522,7 +525,7 @@ function *() {
 </section>
   </div>
   <div class="slide hidden" id="slide-9">
-    <section class="slide-content"><h3 id="promise-to-thunk">promise to thunk</h3>
+    <section class="slide-content"><h2 id="promise-to-thunk">promise to thunk</h2>
 <pre><code>function (promise) {
   return function (fn) {
     promise.then(funciton (res) {
@@ -533,12 +536,22 @@ function *() {
 </section>
   </div>
   <div class="slide hidden" id="slide-10">
-    <section class="slide-content"><h3 id="-array-to-thunk-https-github-com-dead-horse-co-and-koa-talk-blob-gh-pages-yield_array-js-"><a href="https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/yield_array.js">Array to thunk</a></h3>
+    <section class="slide-content"><h2 id="-array-to-thunk-https-github-com-dead-horse-co-and-koa-talk-blob-gh-pages-yield_array-js-"><a href="https://github.com/dead-horse/co-and-koa-talk/blob/gh-pages/yield_array.js">Array to thunk</a></h2>
 <pre><code>function arrayToThunk(array) {
   return function (done) {
-    var called = false;
-    var len = array.length;
-    var result = [];
+    var called = false, len = array.length, result = [];
+    // 同时并发的执行 array 里面的异步函数
+    // 异步函数执行完调用 cb
+    // cb 调用 `array.lenth` 次之后执行 done
+    // 这样把一个函数的数组转换成了一个 thunk
+    array.forEach(function (fn, index) {
+      fn(function (err, data) {
+        if (err) return cb(err);
+        result[index] = data;
+        cb();
+      });
+    });
+    // cb 执行 `len` 次之后才会执行 done()
     var cb = function (err) {
       if (called) return;
       if (err) {
@@ -550,21 +563,12 @@ function *() {
         done(null, result);
       }
     };
-    array.forEach(function (fn, index) {
-      fn(function (err, data) {
-        if (err) {
-          return cb(err);
-        }
-        result[index] = data;
-        cb();
-      });
-    });
   };
 }</code></pre>
 </section>
   </div>
   <div class="slide hidden" id="slide-11">
-    <section class="slide-content"><h3 id="-co-https-github-com-visionmedia-co-"><a href="https://github.com/visionmedia/co">co</a></h3>
+    <section class="slide-content"><h2 id="-co-https-github-com-visionmedia-co-"><a href="https://github.com/visionmedia/co">co</a></h2>
 <ul>
 <li>基于 generator 的异步编程</li>
 </ul>
@@ -582,7 +586,7 @@ co(function *() {
 </section>
   </div>
   <div class="slide hidden" id="slide-12">
-    <section class="slide-content"><h3 id="-">原理</h3>
+    <section class="slide-content"><h2 id="-">原理</h2>
 <ul>
 <li><p>可以被 yield 的有： thunk, promise, generator, generatorFunction, object, array</p>
 </li>
@@ -596,7 +600,7 @@ co(function *() {
 </section>
   </div>
   <div class="slide hidden" id="slide-13">
-    <section class="slide-content"><h3 id="series-and-parallel">series and parallel</h3>
+    <section class="slide-content"><h2 id="series-and-parallel">series and parallel</h2>
 <ul>
 <li><code>series</code></li>
 </ul>
@@ -613,7 +617,7 @@ co(function *() {
 </section>
   </div>
   <div class="slide hidden" id="slide-14">
-    <section class="slide-content"><h3 id="-co-">基于 co 的流程控制</h3>
+    <section class="slide-content"><h2 id="-co-">基于 co 的流程控制</h2>
 <ul>
 <li><a href="https://github.com/visionmedia/co-parallel">co-parallel</a>: 控制并发的 parallel</li>
 <li><a href="https://github.com/dead-horse/co-gather">co-gather</a>: 获取所有返回结果和错误的 parallel</li>
@@ -624,7 +628,7 @@ co(function *() {
 </section>
   </div>
   <div class="slide hidden" id="slide-15">
-    <section class="slide-content"><h3 id="-regenerator-https-github-com-facebook-renegerator-"><a href="https://github.com/facebook/renegerator">regenerator</a></h3>
+    <section class="slide-content"><h2 id="-regenerator-https-github-com-facebook-renegerator-"><a href="https://github.com/facebook/renegerator">regenerator</a></h2>
 <ul>
 <li>把 generator 代码编译成 ES5 的代码</li>
 <li>可以实现基于 generator 的编写的库的向下兼容</li>
@@ -639,7 +643,7 @@ co(function *() {
 </section>
   </div>
   <div class="slide hidden" id="slide-16">
-    <section class="slide-content"><h3 id="-koa-https-github-com-koajs-koa-"><a href="https://github.com/koajs/koa">koa</a></h3>
+    <section class="slide-content"><h2 id="-koa-https-github-com-koajs-koa-"><a href="https://github.com/koajs/koa">koa</a></h2>
 <ul>
 <li>TJ 和 express 团队的新作品</li>
 <li>基于 generator 和 co 的异步解决方案</li>
@@ -650,7 +654,7 @@ co(function *() {
 </section>
   </div>
   <div class="slide hidden" id="slide-17">
-    <section class="slide-content"><h3 id="koa-vs-express">koa VS express</h3>
+    <section class="slide-content"><h2 id="koa-vs-express">koa VS express</h2>
 <ul>
 <li>不提供默认路由</li>
 <li>不提供默认的模版渲染</li>
@@ -665,7 +669,7 @@ co(function *() {
 </section>
   </div>
   <div class="slide hidden" id="slide-18">
-    <section class="slide-content"><h3 id="hello-world">Hello world</h3>
+    <section class="slide-content"><h2 id="hello-world">Hello world</h2>
 <pre><code>var koa = require(&#39;koa&#39;);
 var app = koa();
 
@@ -679,7 +683,7 @@ app.listen(7001);</code></pre>
 </section>
   </div>
   <div class="slide hidden" id="slide-19">
-    <section class="slide-content"><h3 id="-">中间件</h3>
+    <section class="slide-content"><h2 id="-">中间件</h2>
 <p><img src="https://raw.github.com/fengmk2/koa-guide/master/onion.png" alt="middleware"></p>
 </section>
   </div>
@@ -694,7 +698,7 @@ app.listen(7001);</code></pre>
 </section>
   </div>
   <div class="slide hidden" id="slide-21">
-    <section class="slide-content"><h3 id="-">更灵活的中间件形式</h3>
+    <section class="slide-content"><h2 id="-">更灵活的中间件形式</h2>
 <pre><code>var koa = require(&#39;koa&#39;);
 var ejs = require(&#39;koa-ejs&#39;);
 var app = koa();
@@ -708,27 +712,18 @@ app.use(function* () {
 </section>
   </div>
   <div class="slide hidden" id="slide-22">
-    <section class="slide-content"><pre><code>var koa = require(&#39;koa&#39;);
-var session = require(&#39;koa-sess&#39;);
-
-var app = koa();
-app.use(session({
-  defer: true
-}));
-
-// 挂载 `session(getter &amp; setter)` 到 context 上
-
-app.use(function* () {
-  var session = yield this.session;
-  session.name = &#39;foo&#39;;
-  this.body = {
-    name: session.name
-  };
-});</code></pre>
+    <section class="slide-content"><h2 id="-">更简洁的中间件实现方式</h2>
+<ul>
+<li>compress 中间件实现<ul>
+<li><a href="https://github.com/koajs/compress/blob/master/index.js">koa-compress</a></li>
+<li><a href="https://github.com/expressjs/compression/blob/master/index.js">express-compression</a></li>
+</ul>
+</li>
+</ul>
 </section>
   </div>
   <div class="slide hidden" id="slide-23">
-    <section class="slide-content"><h3 id="koa-">koa 中的异步</h3>
+    <section class="slide-content"><h2 id="koa-">koa 中的异步</h2>
 <pre><code>var fs = require(&#39;co-fs&#39;);
 
 app.use(function *(){
@@ -745,7 +740,11 @@ app.use(function *(){
 </section>
   </div>
   <div class="slide hidden" id="slide-24">
-    <section class="slide-content"><h3 id="-">异常处理</h3>
+    <section class="slide-content"><h2 id="-">异常处理</h2>
+<ul>
+<li>通过 <code>try catch</code> 来捕获所有的异常</li>
+<li>所有 throw 出去的 error 都会被 koa 捕获到</li>
+</ul>
 <pre><code>app.use(function *() {
   try {
     var file = yield fs.readFile(&#39;./README.md&#39;);
@@ -755,26 +754,61 @@ app.use(function *(){
       this.body = &#39;can not found readme&#39;
       return;
     };
-    return this.throw(err);
+    throw err;
   }
-});</code></pre>
-<pre><code>app.use(function *() {
-  var stream = request(&#39;http://alibaba.com&#39;);
-  // stream.on(&#39;error&#39;, this.onerror); 不再需要监听 error 事件，this.body＝ 会处理
-  this.body = stream;
 });</code></pre>
 </section>
   </div>
   <div class="slide hidden" id="slide-25">
-    <section class="slide-content"><h3 id="-koa-">深入理解 koa 福利</h3>
+    <section class="slide-content"><h2 id="stream-">Stream 的异常处理</h2>
+<ul>
+<li>原生 http server 和 express 中</li>
+</ul>
+<pre><code>http.createServer(function (req, res) {
+  var stream = fs.createReadStream(&#39;filename.txt&#39;);
+  stream
+  .on(&#39;error&#39;, onerror)
+  .pipe(zlib.createGzip())
+  .on(&#39;error&#39;, onerror)
+  .pipe(res);
+
+  function onerror(err) {
+    res.statusCode = 500;
+    res.end(err.message);
+    console.error(err.stack);
+  }
+
+  res.once(&#39;close&#39;, function () {
+    // 如果客户端终止了这个响应，可能导致 `fd` 泄漏, 需要 `unpipe` 来让它关闭这个 `fd`
+    stream.unpipe();
+  });
+});</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-26">
+    <section class="slide-content"><ul>
+<li>koa 中通过神奇的 <code>this.body=</code> 帮你处理 Stream 的各种坑<ul>
+<li>不用担心 fd leak</li>
+<li>不用负责监听 error</li>
+</ul>
+</li>
+</ul>
+<pre><code>app.use(function *() {
+  this.body = fs.createReadStream(&#39;filename.txt&#39;);
+  this.body = this.body.pipe(zlib.createGzip());
+});</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-27">
+    <section class="slide-content"><h2 id="-koa-">深入理解 koa 福利</h2>
 <ul>
 <li><a href="http://jongleberry.com/why-you-should-and-shouldnt-use-koa.html">why you should and shouldnt use koa</a></li>
 <li><a href="https://github.com/jonathanong/koajs">jonathanong/koajs</a></li>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-26">
-    <section class="slide-content"><h3 id="-koa-">基于 koa 的应用</h3>
+  <div class="slide hidden" id="slide-28">
+    <section class="slide-content"><h2 id="-koa-">基于 koa 的应用</h2>
 <ul>
 <li><a href="http://cnpmjs.org/">cnpmjs.org</a> - Private npm registry and web for Enterprise, base on koa, MySQL and Simple Store Service.</li>
 <li><a href="https://github.com/funraiseme/simgr-server">simgr</a> - Image proxy and resizing server</li>
@@ -782,16 +816,17 @@ app.use(function *(){
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-27">
-    <section class="slide-content"><h3 id="-">更多中间件</h3>
+  <div class="slide hidden" id="slide-29">
+    <section class="slide-content"><h2 id="-">更多中间件</h2>
 <ul>
 <li><a href="https://github.com/koajs/koa/wiki">koa-wiki</a></li>
 <li><a href="https://github.com/koajs">koajs</a></li>
+<li><a href="https://github.com/cnpmjs/koa-middlewares">koa-middlewares</a></li>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-28">
-    <section class="slide-content"><h3 id="connect-experss-koa-">connect / experss 向 koa 迁移</h3>
+  <div class="slide hidden" id="slide-30">
+    <section class="slide-content"><h2 id="connect-experss-koa-">connect / experss 向 koa 迁移</h2>
 <ul>
 <li>框架配置和中间件替换</li>
 <li>model(proxy) 层通过 <code>thunkify</code> 或者 <code>thunkify-wrap</code> 包装</li>
@@ -800,8 +835,8 @@ app.use(function *(){
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-29">
-    <section class="slide-content"><h3 id="-co-">基于 co 的单元测试</h3>
+  <div class="slide hidden" id="slide-31">
+    <section class="slide-content"><h2 id="-co-">基于 co 的单元测试</h2>
 <ul>
 <li>mocha 开启选项： --harmony</li>
 <li>mocha 添加依赖：--require co-mocha</li>
@@ -815,8 +850,8 @@ it(&#39;should co work fine&#39;, function *() {
 });</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-30">
-    <section class="slide-content"><h3 id="-">推荐关注</h3>
+  <div class="slide hidden" id="slide-32">
+    <section class="slide-content"><h2 id="-">推荐关注</h2>
 <ul>
 <li><a href="https://github.com/koajs">koajs</a></li>
 <li><a href="https://github.com/cojs">cojs</a></li>
@@ -826,24 +861,20 @@ it(&#39;should co work fine&#39;, function *() {
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-31">
+  <div class="slide hidden" id="slide-33">
     <section class="slide-content"><h1 id="q-a">Q &amp; A</h1>
 </section>
   </div>
-  <div class="slide hidden" id="slide-32">
+  <div class="slide hidden" id="slide-34">
     <section class="slide-content"><div class="author">
   <h1 class="name">dead_horse</h1>
     <h3 class="url">
-      <a href="http://deadhorse.me">http://deadhorse.me</a>
+      <a href="https://github.com/dead-horse">https://github.com/dead-horse</a>
     </h3>
 </div>
 </section>
   </div>
 
-  <div class="controls">
-    <div class="arrow prev"></div>
-    <div class="arrow next"></div>
-  </div>
 
 
   <script type="text/javascript">
